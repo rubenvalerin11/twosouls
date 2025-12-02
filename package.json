@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "recharts": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10"
+  }
+}
