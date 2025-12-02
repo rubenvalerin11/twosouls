@@ -1,9 +1,8 @@
-// OPCIONAL – solo si luego quieres sacar el sidebar a componente
-import React from "react";
+// frontend/app/admin-panel/components/SideBar.tsx
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Sidebar() {
+export default function SideBar() {
   const pathname = usePathname();
 
   const linkClasses = (href: string) =>
@@ -14,19 +13,21 @@ export function Sidebar() {
     }`;
 
   return (
-    <aside className="w-64 border-r border-white/10 bg-black/80 p-5 flex flex-col">
-      <h1 className="text-xl font-black mb-6">TwoSouls · Admin</h1>
+    <aside className="w-64 border-r border-white/10 bg-black/70 p-5">
+      <h1 className="text-lg font-bold mb-6">TwoSouls · Admin</h1>
 
       <nav className="space-y-1">
         <Link href="/admin-panel" className={linkClasses("/admin-panel")}>
           Dashboard
         </Link>
+
         <Link
           href="/admin-panel/products"
           className={linkClasses("/admin-panel/products")}
         >
           Productos
         </Link>
+
         <Link
           href="/admin-panel/orders"
           className={linkClasses("/admin-panel/orders")}
@@ -35,8 +36,8 @@ export function Sidebar() {
         </Link>
       </nav>
 
-      <p className="mt-auto text-[11px] text-white/40">
-        Vista interna para administración.
+      <p className="mt-8 text-[11px] text-white/40">
+        Panel interno TwoSouls. Cambios en vivo.
       </p>
     </aside>
   );

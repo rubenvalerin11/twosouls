@@ -1,84 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import useAdminAuth from "@/lib/useAdminAuth";
 
-export default function AdminLogin() {
-  const router = useRouter();
+export default function LoginPage() {
+  const { login, loading } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  async function handleLogin(e: any) {
+  const handleLogin = async (e: any) => {
     e.preventDefault();
-    setError("");
 
-    try {
-      const res = await fetch("http://localhost:3001/api/admin/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+    const res = await login(email, password);
 
-      if (!res.ok) {
-        setError("Credenciales inválidas.");
-        return;
-      }
-
-      router.push("/admin-panel");
-    } catch (err) {
-      console.error(err);
-      setError("Error de conexión.");
+    if (!res.ok) {
+      setErrorMsg(res.message || "Error");
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <div className="bg-white/5 border border-white/20 p-10 rounded-xl w-[420px] shadow-xl">
+    <div className="flex justify-center items-center h-[90vh]">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white/5 p-8 rounded-xl w-[380px] border border-white/10"
+      >
+        <h1 className="text-2xl font-semibold text-center mb-6">ShopAdmin</h1>
 
-        <h1 className="text-center text-3xl font-bold mb-2">ShopAdmin</h1>
-        <p className="text-center text-sm text-white/60 mb-8">
-          Admin Panel · TwoSouls
-        </p>
+        <label className="block mb-3 text-sm">Email</label>
+        <input
+          className="w-full px-3 py-2 mb-4 bg-black/40 border border-white/20 rounded-lg"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="text-sm">Email</label>
-            <input
-              type="email"
-              className="w-full bg-black border border-white/20 rounded-lg px-3 py-2 mt-1"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        <label className="block mb-3 text-sm">Password</label>
+        <input
+          type="password"
+          className="w-full px-3 py-2 mb-4 bg-black/40 border border-white/20 rounded-lg"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <div>
-            <label className="text-sm">Password</label>
-            <input
-              type="password"
-              className="w-full bg-black border border-white/20 rounded-lg px-3 py-2 mt-1"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+        {errorMsg && (
+          <p className="text-red-400 text-sm mb-3 text-center">{errorMsg}</p>
+        )}
 
-          {error && <p className="text-red-400 text-center">{error}</p>}
-
-          <button
-            type="submit"
-            className="w-full bg-white text-black font-semibold py-2 rounded-lg mt-2"
-          >
-            Sign In
-          </button>
-        </form>
-
-        <p className="text-[11px] text-center mt-5 text-white/40">
-          Usa las mismas credenciales del backend (ENV).
-        </p>
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-white text-black font-semibold py-2 rounded-lg"
+        >
+          {loading ? "Ingresando..." : "Sign In"}
+        </button>
+      </form>
     </div>
   );
 }

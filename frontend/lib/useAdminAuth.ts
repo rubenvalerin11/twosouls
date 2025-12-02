@@ -1,43 +1,40 @@
 "use client";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export async function loginAdmin(email: string, password: string) {
-  try {
-    console.log("🔐 Login admin payload:", { email, password });
+export default function useAdminAuth() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-    const res = await fetch(`${API_BASE}/admin/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
-    });
+  const login = async (email: string, password: string) => {
+    try {
+      setLoading(true);
 
-    console.log("🔐 Login admin status:", res.status);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("🔐 Login admin body:", text);
-      return { success: false };
+      if (!res.ok) {
+        return { ok: false, message: "Credenciales inválidas" };
+      }
+
+      // éxito → ir al panel
+      router.push("/admin-panel");
+      return { ok: true };
+    } catch (error) {
+      console.log("LOGIN ERROR:", error);
+      return { ok: false, message: "Error de servidor" };
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const data = await res.json().catch(() => null);
-    console.log("🔐 Login admin data:", data);
-    return data ?? { success: false };
-  } catch (error) {
-    console.error("🔐 LOGIN ERROR:", error);
-    return { success: false };
-  }
-}
-
-export async function logoutAdmin() {
-  try {
-    await fetch(`${API_BASE}/admin/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-  } catch (error) {
-    console.error("🔐 LOGOUT ERROR:", error);
-  }
+  return { login, loading };
 }

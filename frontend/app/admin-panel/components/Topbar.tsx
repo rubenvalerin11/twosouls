@@ -1,23 +1,12 @@
-import React from "react";
+// frontend/app/admin-panel/components/Topbar.tsx
+"use client";
 
-export function Topbar() {
+export default function Topbar() {
   return (
-    <header className="flex items-center justify-between mb-8">
-      <div>
-        <h2 className="text-2xl font-bold">Dashboard</h2>
-        <p className="text-sm text-white/50">
-          Resumen general de tu tienda TwoSouls.
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <button className="text-xs px-3 py-1.5 rounded-full border border-white/20 text-white/70 hover:bg-white/10 transition">
-          Ver tienda
-        </button>
-        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs">
-          TS
-        </div>
-      </div>
-    </header>
+    <div className="w-full border-b border-white/10 bg-white/5 p-4 flex items-center justify-between">
+      <h2 className="text-white/80 text-sm tracking-wide">
+        Panel Administrativo
+      </h2>
+    </div>
   );
 }

@@ -2,7 +2,8 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
-// TIPOS
+// ───────── Tipos base ─────────
+
 export interface AdminProduct {
   _id: string;
   name: string;
@@ -15,35 +16,35 @@ export interface AdminProduct {
   updatedAt?: string;
 }
 
-export interface AdminProductInput {
-  name: string;
-  price: number;
-  stock: number;
-  description?: string;
-  imageUrl: string;
-  sizes?: string[];
-}
-
 export interface AdminOrderItem {
-  id: string;
+  productId?: string;
   name: string;
-  size: string;
+  size?: string;
   quantity: number;
   price: number;
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 export interface AdminOrder {
   _id: string;
   email?: string;
-  customer?: any;
+  status: "pending" | "paid" | "shipped" | "cancelled";
   items: AdminOrderItem[];
   total: number;
-  status: string; // "pending", "paid", "shipped", "cancelled"
   createdAt?: string;
+  updatedAt?: string;
+  shippingAddress?: {
+    fullName?: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    postalCode?: string;
+    phone?: string;
+  };
 }
 
-// Helper interno
+// ───────── Helper general ─────────
+
 async function adminFetch(path: string, init?: RequestInit) {
   const res = await fetch(`${API_URL}${path}`, {
     credentials: "include",
@@ -67,41 +68,20 @@ async function adminFetch(path: string, init?: RequestInit) {
   return res.json();
 }
 
-// ───────────── PRODUCTOS ─────────────
+// ───────── Productos (para métricas / futuro CRUD) ─────────
 
 export async function getAdminProducts(): Promise<AdminProduct[]> {
   return adminFetch("/admin/products");
 }
 
-export async function createAdminProduct(
-  data: AdminProductInput
-): Promise<AdminProduct> {
-  return adminFetch("/admin/products", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function updateAdminProduct(
-  id: string,
-  data: Partial<AdminProductInput>
-): Promise<AdminProduct> {
-  return adminFetch(`/admin/products/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function deleteAdminProduct(id: string): Promise<{ message: string }> {
-  return adminFetch(`/admin/products/${id}`, {
-    method: "DELETE",
-  });
-}
-
-// ───────────── ÓRDENES ─────────────
+// ───────── Órdenes ─────────
 
 export async function getAdminOrders(): Promise<AdminOrder[]> {
   return adminFetch("/admin/orders");
+}
+
+export async function getAdminOrderById(id: string): Promise<AdminOrder> {
+  return adminFetch(`/admin/orders/${id}`);
 }
 
 export async function updateAdminOrderStatus(
@@ -112,4 +92,38 @@ export async function updateAdminOrderStatus(
     method: "PUT",
     body: JSON.stringify({ status }),
   });
+}
+
+// ───────── Métricas para el dashboard ─────────
+
+export interface AdminDashboardStats {
+  totalRevenue: number;
+  totalOrders: number;
+  totalProducts: number;
+  pendingOrders: number;
+  shippedOrders: number;
+  cancelledOrders: number;
+}
+
+export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
+  const [orders, products] = await Promise.all([
+    getAdminOrders(),
+    getAdminProducts(),
+  ]);
+
+  const totalRevenue = orders.reduce((acc, o) => acc + (o.total || 0), 0);
+  const totalOrders = orders.length;
+  const pendingOrders = orders.filter((o) => o.status === "pending").length;
+  const shippedOrders = orders.filter((o) => o.status === "shipped").length;
+  const cancelledOrders = orders.filter((o) => o.status === "cancelled").length;
+  const totalProducts = products.length;
+
+  return {
+    totalRevenue,
+    totalOrders,
+    totalProducts,
+    pendingOrders,
+    shippedOrders,
+    cancelledOrders,
+  };
 }

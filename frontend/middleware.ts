@@ -2,21 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("admin_token")?.value || null;
+  const token = req.cookies.get("admin_token")?.value;
 
-  const isAdminRoute = req.nextUrl.pathname.startsWith("/admin-panel");
-  const isLoginPage = req.nextUrl.pathname === "/admin-panel/login";
+  const isLogin = req.nextUrl.pathname.startsWith("/admin-panel/login");
+  const isProtected = req.nextUrl.pathname.startsWith("/admin-panel");
 
-  // Si NO hay token → solo permitir login
-  if (!token) {
-    if (!isLoginPage && isAdminRoute) {
-      return NextResponse.redirect(new URL("/admin-panel/login", req.url));
-    }
-    return NextResponse.next();
+  // no token → enviar al login
+  if (!token && isProtected && !isLogin) {
+    return NextResponse.redirect(new URL("/admin-panel/login", req.url));
   }
 
-  // Si SÍ hay token → NO permitir volver al login
-  if (token && isLoginPage) {
+  // si ya está logueado → evitar volver al login
+  if (token && isLogin) {
     return NextResponse.redirect(new URL("/admin-panel", req.url));
   }
 
