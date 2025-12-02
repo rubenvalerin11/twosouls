@@ -2,18 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("admin_token")?.value;
+  const adminToken = req.cookies.get("adminToken")?.value;
 
   const isLogin = req.nextUrl.pathname.startsWith("/admin-panel/login");
-  const isProtected = req.nextUrl.pathname.startsWith("/admin-panel");
+  const isAdmin = req.nextUrl.pathname.startsWith("/admin-panel");
 
-  // no token → enviar al login
-  if (!token && isProtected && !isLogin) {
+  // Si intenta entrar al panel sin token
+  if (isAdmin && !adminToken && !isLogin) {
     return NextResponse.redirect(new URL("/admin-panel/login", req.url));
   }
 
-  // si ya está logueado → evitar volver al login
-  if (token && isLogin) {
+  // Si ya tiene token y va a /login → lo mando al panel
+  if (isLogin && adminToken) {
     return NextResponse.redirect(new URL("/admin-panel", req.url));
   }
 

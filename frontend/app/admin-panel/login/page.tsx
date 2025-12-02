@@ -1,57 +1,73 @@
 "use client";
 
 import { useState } from "react";
-import useAdminAuth from "@/lib/useAdminAuth";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
-  const { login, loading } = useAdminAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+export default function AdminLogin() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const res = await login(email, password);
+    try {
+      const res = await axios.post(
+        "http://localhost:3001/api/admin/login",
+        {
+          email: e.target.email.value,
+          password: e.target.password.value,
+        },
+        { withCredentials: true }
+      );
 
-    if (!res.ok) {
-      setErrorMsg(res.message || "Error");
+      if (res.data?.success === true) {
+        router.push("/admin-panel");
+      } else {
+        setError("Credenciales incorrectas");
+      }
+    } catch (err: any) {
+      setError("Error en el servidor");
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="flex justify-center items-center h-[90vh]">
+    <div className="w-full h-screen flex items-center justify-center bg-black text-white">
       <form
         onSubmit={handleLogin}
-        className="bg-white/5 p-8 rounded-xl w-[380px] border border-white/10"
+        className="p-8 bg-neutral-900 rounded-xl shadow-xl w-[340px]"
       >
-        <h1 className="text-2xl font-semibold text-center mb-6">ShopAdmin</h1>
+        <h1 className="text-2xl font-semibold mb-4">Two Souls — Admin</h1>
 
-        <label className="block mb-3 text-sm">Email</label>
         <input
-          className="w-full px-3 py-2 mb-4 bg-black/40 border border-white/20 rounded-lg"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          type="email"
+          placeholder="Email"
+          className="w-full mb-3 p-3 rounded bg-neutral-800"
+          required
         />
 
-        <label className="block mb-3 text-sm">Password</label>
         <input
+          name="password"
           type="password"
-          className="w-full px-3 py-2 mb-4 bg-black/40 border border-white/20 rounded-lg"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="w-full mb-4 p-3 rounded bg-neutral-800"
+          required
         />
 
-        {errorMsg && (
-          <p className="text-red-400 text-sm mb-3 text-center">{errorMsg}</p>
-        )}
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-white text-black font-semibold py-2 rounded-lg"
+          className="w-full py-3 bg-white text-black rounded-lg font-semibold"
         >
-          {loading ? "Ingresando..." : "Sign In"}
+          {loading ? "Ingresando..." : "Ingresar"}
         </button>
       </form>
     </div>

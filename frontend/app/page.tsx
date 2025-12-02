@@ -1,173 +1,223 @@
+// frontend/app/admin-panel/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import Hero from "@/app/components/Hero";
-import AboutSection from "@/app/components/AboutSection";
-import ProductCard from "@/app/components/ProductCard";
-import ProductSidebar from "@/app/components/ProductSidebar";
-import CartSidebar from "@/app/components/CartSidebar";
-import { fetchProducts } from "@/lib/api";
-import { useCart } from "./context/CartContext";
-import PayPalButton from "@/app/components/PayPalButton";
+import { useEffect, useState } from "react";
+import {
+  getAdminDashboardData,
+  DashboardMetrics,
+} from "@/lib/adminApi";
+import { useRouter } from "next/navigation";
+import { FiBox, FiShoppingBag, FiAlertCircle, FiDollarSign } from "react-icons/fi";
 
+type LoadState = "idle" | "loading" | "ok" | "error";
 
-export default function HomePage() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
-
-  const { addItem, cartOpen, setCartOpen } = useCart();
+export default function AdminDashboardPage() {
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [state, setState] = useState<LoadState>("idle");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const load = async () => {
+    let cancelled = false;
+
+    async function load() {
+      setState("loading");
+      setErrorMsg(null);
+
       try {
-        const response = await fetchProducts();
+        const data = await getAdminDashboardData();
+        if (cancelled) return;
 
-        // ORDENAR: CAMISA PRIMERO
-        const sorted = [...response].sort((a, b) => {
-          const nameA = a.name.toLowerCase();
-          const nameB = b.name.toLowerCase();
+        setMetrics(data);
+        setState("ok");
+      } catch (err: any) {
+        if (cancelled) return;
 
-          if (nameA.includes("camisa")) return -1;
-          if (nameB.includes("camisa")) return 1;
-          return 0;
-        });
+        console.error("Dashboard error:", err);
 
-        setProducts(sorted);
-      } catch (error) {
-        console.error("Error cargando productos:", error);
+        // Si el backend responde 401 => mandar al login
+        if (err?.status === 401) {
+          router.replace("/admin-panel/login?from=/admin-panel");
+          return;
+        }
+
+        setErrorMsg("No se pudieron cargar las métricas del dashboard.");
+        setState("error");
       }
-    };
+    }
 
     load();
-  }, []);
-
-  const collections = [
-    {
-      label: "FIRST DROP",
-      title: "Camisas",
-      subtitle: "Boxy fit, 100% algodón.",
-      slug: "camisas",
-    },
-    {
-      label: "REGALÍAS",
-      title: "Stickers",
-      subtitle: "Sticker de nuestro logo en un tono mate.",
-      slug: "stickers",
-    },
-  ];
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   return (
-    <main className="bg-[#f4f3f1] text-black">
-      {/* HERO */}
-      <Hero />
+    <div className="space-y-8">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">
+            Panel Administrativo
+          </h1>
+          <p className="text-sm text-white/60">
+            Datos actualizados automáticamente desde tu API.
+          </p>
+        </div>
+      </header>
 
-      {/* SECCIÓN DE PRODUCTOS */}
-      <section id="productos" className="border-y border-black/10 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-12">
-          <div className="mb-8">
-            <p className="text-[0.65rem] uppercase tracking-[0.25em] text-black/60">
-              Drop limitado · TwoSouls
+      {/* Estado de error */}
+      {state === "error" && (
+        <div className="rounded-md border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+          {errorMsg || "Ocurrió un error inesperado en el dashboard."}
+        </div>
+      )}
+
+      {/* KPIs principales */}
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          icon={<FiShoppingBag className="h-6 w-6" />}
+          label="Pedidos totales"
+          value={
+            metrics ? metrics.totalOrders.toLocaleString("es-CR") : "—"
+          }
+          loading={state === "loading" && !metrics}
+        />
+
+        <StatCard
+          icon={<FiDollarSign className="h-6 w-6" />}
+          label="Ingresos totales"
+          value={
+            metrics
+              ? `₡ ${metrics.totalRevenue.toLocaleString("es-CR")}`
+              : "—"
+          }
+          loading={state === "loading" && !metrics}
+        />
+
+        <StatCard
+          icon={<FiAlertCircle className="h-6 w-6" />}
+          label="Pedidos pendientes"
+          value={
+            metrics ? metrics.pendingOrders.toLocaleString("es-CR") : "—"
+          }
+          loading={state === "loading" && !metrics}
+        />
+
+        <StatCard
+          icon={<FiBox className="h-6 w-6" />}
+          label="Productos activos"
+          value={
+            metrics ? metrics.totalProducts.toLocaleString("es-CR") : "—"
+          }
+          loading={state === "loading" && !metrics}
+        />
+      </section>
+
+      {/* Últimos pedidos */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 rounded-2xl border border-white/10 bg-black/40 p-4">
+          <h2 className="mb-3 text-sm font-semibold text-white">
+            Últimos pedidos
+          </h2>
+
+          {state === "loading" && !metrics && (
+            <p className="text-sm text-white/60">Cargando pedidos…</p>
+          )}
+
+          {metrics && metrics.lastOrders.length === 0 && (
+            <p className="text-sm text-white/60">
+              Aún no hay pedidos registrados.
             </p>
+          )}
 
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-              Colección
-            </h2>
-          </div>
-
-          {products.length === 0 ? (
-            <p className="mt-6 text-sm text-black/60">
-              Aún no hay productos publicados.
-            </p>
-          ) : (
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((p: any) => (
-                <ProductCard
-                  key={p._id}
-                  product={{
-                    id: p._id,
-                    name: p.name,
-                    price: p.price,
-                    description: p.description,
-                    imageUrl: p.imageUrl,
-                    sizes: ["S", "M", "L"],
-                  }}
-                  onClick={() => {
-                    setSelectedProduct(p);
-                    setSidebarOpen(true);
-                  }}
-                />
-              ))}
+          {metrics && metrics.lastOrders.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead className="border-b border-white/10 text-xs uppercase text-white/50">
+                  <tr>
+                    <th className="py-2 pr-4">Pedido</th>
+                    <th className="py-2 pr-4">Cliente</th>
+                    <th className="py-2 pr-4">Fecha</th>
+                    <th className="py-2 pr-4 text-right">Total</th>
+                    <th className="py-2 pr-4 text-right">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics.lastOrders.map((order) => (
+                    <tr
+                      key={order._id}
+                      className="border-b border-white/5 last:border-none hover:bg-white/5"
+                    >
+                      <td className="py-2 pr-4 text-white/80">
+                        #{order._id.slice(-6)}
+                      </td>
+                      <td className="py-2 pr-4 text-white/60">
+                        {order.user?.name || "—"}
+                      </td>
+                      <td className="py-2 pr-4 text-white/60">
+                        {order.createdAt
+                          ? new Date(order.createdAt).toLocaleString("es-CR")
+                          : "—"}
+                      </td>
+                      <td className="py-2 pr-4 text-right text-white">
+                        {typeof order.totalAmount === "number" ||
+                        typeof order.total === "number"
+                          ? `₡ ${(
+                              order.totalAmount ?? order.total ?? 0
+                            ).toLocaleString("es-CR")}`
+                          : "—"}
+                      </td>
+                      <td className="py-2 pr-4 text-right">
+                        <span className="inline-flex rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">
+                          {order.status || "—"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
-      </section>
 
-      {/* SECCIÓN COLECCIONES */}
-      <section id="colecciones" className="mx-auto max-w-6xl px-4 py-16">
-        <div>
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-black/60">
-            Colecciones
-          </p>
-
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-            Explora el drip de TwoSouls
+        {/* Caja lateral para notas / future charts */}
+        <div className="rounded-2xl border border-white/10 bg-black/40 p-4">
+          <h2 className="mb-2 text-sm font-semibold text-white">
+            Estado general
           </h2>
-        </div>
-
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {collections.map((c) => (
-            <div
-              key={c.slug}
-              className="flex flex-col justify-between rounded-3xl border border-black/10 bg-[#f4f3f1] px-4 py-6 shadow-sm"
-            >
-              <div>
-                <p className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-black/45">
-                  {c.label}
-                </p>
-
-                <h3 className="mt-2 text-base font-semibold">{c.title}</h3>
-
-                <p className="mt-1 text-xs text-black/60">{c.subtitle}</p>
-              </div>
-
-              <span className="mt-4 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-black/80">
-                Ver {c.slug}
-              </span>
-            </div>
-          ))}
+          <p className="text-sm text-white/60">
+            Aquí más adelante podemos agregar gráficas (ventas por día,
+            estados de pedidos, etc.). Por ahora se muestran los KPIs
+            principales en tiempo real.
+          </p>
         </div>
       </section>
+    </div>
+  );
+}
 
-      {/* ABOUT */}
-      <AboutSection />
-
-      {/* SIDEBARS */}
-      <ProductSidebar
-        open={sidebarOpen}
-        product={selectedProduct}
-        onClose={() => setSidebarOpen(false)}
-        onAddToCart={(product, size, quantity) => {
-          if (!product) return;
-
-          addItem({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            imageUrl: product.imageUrl,
-            size,
-            quantity,
-          });
-
-          setSidebarOpen(false);
-        }}
-      />
-
-      {/* 🛒 FIX DEFINITIVO: PROP CORRECTO */}
-      <CartSidebar
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-      />
-    </main>
+function StatCard({
+  icon,
+  label,
+  value,
+  loading,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  loading?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/40 px-4 py-3">
+      <div>
+        <p className="text-xs text-white/50">{label}</p>
+        <p className="mt-1 text-xl font-semibold text-white">
+          {loading ? "…" : value}
+        </p>
+      </div>
+      <div className="rounded-full bg-white/10 p-2 text-white/80">
+        {icon}
+      </div>
+    </div>
   );
 }
