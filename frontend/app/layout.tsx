@@ -1,17 +1,29 @@
-import "./globals.css";
-import { CartProvider } from "./context/CartContext";
-import RouteProvider from "./RouteProvider";
+"use client";
 
-export default function RootLayout({ children }) {
+import Sidebar from "./components/Sidebar";
+import Topbar from "./components/Topbar";
+import "../globals.css";
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className="min-h-screen bg-[#f4f3f1] text-black flex flex-col">
-        <CartProvider>
-          <RouteProvider>
-            <main className="flex-1">{children}</main>
-          </RouteProvider>
-        </CartProvider>
-      </body>
-    </html>
+    <div className="w-full h-screen flex overflow-hidden bg-black text-white">
+
+      {/* SIDEBAR */}
+      <div className="w-[250px] bg-neutral-950 border-r border-neutral-800">
+        <Sidebar />
+      </div>
+
+      {/* TOPBAR + CONTENT */}
+      <div className="flex-1 flex flex-col h-full">
+        <div className="h-16 bg-neutral-950 border-b border-neutral-800">
+          <Topbar />
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          {children}
+        </div>
+      </div>
+
+    </div>
   );
 }

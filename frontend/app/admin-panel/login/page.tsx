@@ -11,12 +11,12 @@ export default function AdminLogin() {
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
       const res = await axios.post(
-        "http://localhost:3001/api/admin/login",
+        "http://localhost:3001/api/admin/auth/login",
         {
           email: e.target.email.value,
           password: e.target.password.value,
@@ -24,13 +24,13 @@ export default function AdminLogin() {
         { withCredentials: true }
       );
 
-      if (res.data.success === true) {
+      if (res.data.success) {
         router.push("/admin-panel");
       } else {
         setError("Credenciales incorrectas");
       }
-
     } catch (err) {
+      console.error("Login error:", err);
       setError("Error en el servidor");
     }
 
