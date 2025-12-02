@@ -1,29 +1,23 @@
-"use client";
+export const metadata = {
+  title: "Panel Admin | Two Souls",
+};
 
-import Sidebar from "./components/Sidebar";
-import Topbar from "./components/Topbar";
-import "../globals.css";
-
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-screen flex overflow-hidden bg-black text-white">
-      {/* SIDEBAR */}
-      <div className="w-[250px] bg-neutral-950 border-r border-neutral-800">
-        <Sidebar />
-      </div>
-
-      {/* TOPBAR + CONTENIDO */}
-      <div className="flex-1 flex flex-col h-full">
-        <div className="h-16 bg-neutral-950 border-b border-neutral-800">
-          <Topbar />
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6">{children}</div>
-      </div>
-    </div>
+    <html lang="es">
+      <body
+        style={{
+          fontFamily: "Arial, sans-serif",
+          backgroundColor: "#0f0f0f",
+          color: "#ffffff",
+          margin: 0,
+          padding: "2rem",
+          minHeight: "100vh",
+        }}
+      >
+        <h1 style={{ marginBottom: "2rem", color: "#4f46e5" }}>Panel Administrativo</h1>
+        <main>{children}</main>
+      </body>
+    </html>
   );
 }

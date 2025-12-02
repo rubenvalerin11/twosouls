@@ -1,75 +1,74 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export default function AdminLogin() {
+export default function AdminLoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function handleLogin(e: any) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
 
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    setError("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:3001/api/admin/auth/login",
-        { email, password },
-        { withCredentials: true } //  OBLIGATORIO para recibir cookie
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // 🔥 NECESARIO para httpOnly cookies
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (res.data.success) {
-        router.push("/admin-panel");
-      } else {
-        setError("Credenciales incorrectas");
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.message || "Credenciales incorrectas");
+        return;
       }
-    } catch (err: any) {
-      console.log("LOGIN ERROR:", err.response?.data || err);
-      setError("Error en el servidor");
-    }
 
-    setLoading(false);
-  }
+      // 🔁 Redireccionar si todo OK
+      router.push("/admin-panel/dashboard");
+    } catch (err) {
+      setError("Error del servidor");
+    }
+  };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-black text-white">
-      <form
-        onSubmit={handleLogin}
-        className="bg-neutral-900 p-6 rounded-xl w-[350px] border border-neutral-800"
-      >
-        <h1 className="text-xl font-bold mb-4">Admin Two Souls</h1>
-
+    <div style={{ maxWidth: "400px", margin: "100px auto", color: "#fff" }}>
+      <h2>Admin Login</h2>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <input
-          name="email"
           type="email"
           placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-3 mb-3 bg-neutral-800 rounded"
+          style={{ padding: "10px", borderRadius: "5px" }}
         />
-
         <input
-          name="password"
           type="password"
           placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-3 mb-4 bg-neutral-800 rounded"
+          style={{ padding: "10px", borderRadius: "5px" }}
         />
-
-        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-
         <button
-          disabled={loading}
-          className="w-full bg-white text-black py-3 rounded font-semibold"
+          type="submit"
+          style={{
+            padding: "10px",
+            borderRadius: "5px",
+            background: "#4f46e5",
+            color: "#fff",
+            border: "none",
+          }}
         >
-          {loading ? "Ingresando..." : "Ingresar"}
+          Ingresar
         </button>
+        {error && <p style={{ color: "tomato" }}>{error}</p>}
       </form>
     </div>
   );

@@ -1,7 +1,7 @@
 // backend/routes/adminOrderRoutes.js
 import express from "express";
 import Order from "../models/Order.js";
-import { verifyAdmin } from "../middleware/authMiddleware.js";
+import { verifyAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 

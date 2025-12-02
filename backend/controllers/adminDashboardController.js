@@ -1,6 +1,7 @@
 // backend/controllers/adminDashboardController.js
 
-exports.getDashboardMetrics = (req, res) => {
+
+export const getDashboardMetrics = (req, res) => {
   res.status(200).json({
     totalOrders: 8,
     pendingOrders: 3,
