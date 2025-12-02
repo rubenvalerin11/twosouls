@@ -1,24 +1,35 @@
-// frontend/app/admin-panel/layout.tsx
 "use client";
 
-import SideBar from "./components/SideBar";
+import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
+import "../globals.css";
 
-export default function AdminPanelLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {  
   return (
-    <div className="min-h-screen flex bg-[#050505] text-white">
-      <SideBar />
+    <html lang="es">
+      <body className="bg-black text-white h-screen overflow-hidden">
+        <div className="flex h-full w-full">
 
-      <div className="flex-1 flex flex-col">
-        <Topbar />
-        <main className="p-8 bg-gradient-to-b from-[#050505] to-black flex-1">
-          {children}
-        </main>
-      </div>
-    </div>
+          {/* SIDEBAR */}
+          <div className="w-[250px] bg-neutral-950 border-r border-neutral-800">
+            <Sidebar />
+          </div>
+
+          {/* MAIN CONTENT */}
+          <div className="flex-1 flex flex-col">
+
+            {/* TOPBAR */}
+            <div className="h-16 border-b border-neutral-800 bg-neutral-950">
+              <Topbar />
+            </div>
+
+            {/* PAGE */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {children}
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
   );
 }

@@ -11,8 +11,8 @@ export default function AdminLogin() {
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
 
     try {
       const res = await axios.post(
@@ -24,12 +24,13 @@ export default function AdminLogin() {
         { withCredentials: true }
       );
 
-      if (res.data?.success === true) {
+      if (res.data.success === true) {
         router.push("/admin-panel");
       } else {
         setError("Credenciales incorrectas");
       }
-    } catch (err: any) {
+
+    } catch (err) {
       setError("Error en el servidor");
     }
 
@@ -40,15 +41,15 @@ export default function AdminLogin() {
     <div className="w-full h-screen flex items-center justify-center bg-black text-white">
       <form
         onSubmit={handleLogin}
-        className="p-8 bg-neutral-900 rounded-xl shadow-xl w-[340px]"
+        className="w-[340px] p-6 bg-neutral-900 border border-neutral-800 rounded-xl shadow-lg"
       >
-        <h1 className="text-2xl font-semibold mb-4">Two Souls — Admin</h1>
+        <h1 className="text-2xl font-semibold mb-4">Admin Two Souls</h1>
 
         <input
           name="email"
           type="email"
           placeholder="Email"
-          className="w-full mb-3 p-3 rounded bg-neutral-800"
+          className="w-full mb-3 p-3 rounded bg-neutral-800 outline-none"
           required
         />
 
@@ -56,16 +57,15 @@ export default function AdminLogin() {
           name="password"
           type="password"
           placeholder="Password"
-          className="w-full mb-4 p-3 rounded bg-neutral-800"
+          className="w-full mb-4 p-3 rounded bg-neutral-800 outline-none"
           required
         />
 
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
         <button
-          type="submit"
-          disabled={loading}
           className="w-full py-3 bg-white text-black rounded-lg font-semibold"
+          disabled={loading}
         >
           {loading ? "Ingresando..." : "Ingresar"}
         </button>

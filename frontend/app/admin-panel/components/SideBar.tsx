@@ -1,44 +1,41 @@
-// frontend/app/admin-panel/components/SideBar.tsx
+"use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function SideBar() {
+export default function Sidebar() {
   const pathname = usePathname();
 
-  const linkClasses = (href: string) =>
-    `block rounded-lg px-3 py-2 text-sm transition ${
-      pathname.startsWith(href)
-        ? "bg-white text-black font-semibold"
-        : "text-white/70 hover:bg-white/10"
-    }`;
+  const menu = [
+    { name: "Dashboard", path: "/admin-panel" },
+    { name: "Productos", path: "/admin-panel/products" },
+    { name: "Pedidos", path: "/admin-panel/orders" },
+  ];
 
   return (
-    <aside className="w-64 border-r border-white/10 bg-black/70 p-5">
-      <h1 className="text-lg font-bold mb-6">TwoSouls · Admin</h1>
+    <nav className="h-full flex flex-col p-4 select-none">
+      <h2 className="text-lg font-bold mb-6">Two Souls</h2>
 
-      <nav className="space-y-1">
-        <Link href="/admin-panel" className={linkClasses("/admin-panel")}>
-          Dashboard
-        </Link>
+      <ul className="flex flex-col gap-2">
+        {menu.map((item) => {
+          const active = pathname === item.path;
 
-        <Link
-          href="/admin-panel/products"
-          className={linkClasses("/admin-panel/products")}
-        >
-          Productos
-        </Link>
-
-        <Link
-          href="/admin-panel/orders"
-          className={linkClasses("/admin-panel/orders")}
-        >
-          Pedidos
-        </Link>
-      </nav>
-
-      <p className="mt-8 text-[11px] text-white/40">
-        Panel interno TwoSouls. Cambios en vivo.
-      </p>
-    </aside>
+          return (
+            <li key={item.path}>
+              <Link
+                href={item.path}
+                className={`block px-3 py-2 rounded-lg transition ${
+                  active
+                    ? "bg-neutral-800 text-white"
+                    : "text-neutral-400 hover:bg-neutral-900"
+                }`}
+              >
+                {item.name}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }
