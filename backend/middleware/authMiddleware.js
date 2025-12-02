@@ -1,16 +1,16 @@
+// backend/middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 
 export function verifyAdmin(req, res, next) {
   try {
-    // 1️⃣ Leer token desde cookie
+    console.log("COOKIES RECIBIDAS:", req.cookies); // 🔥 DEBUG
+    
     let token = req.cookies?.admin_token;
 
-    // 2️⃣ Leer token desde Authorization si no viene en cookie
     if (!token && req.headers.authorization?.startsWith("Bearer ")) {
       token = req.headers.authorization.split(" ")[1];
     }
 
-    // 3️⃣ Si no hay token → 401
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -18,7 +18,6 @@ export function verifyAdmin(req, res, next) {
       });
     }
 
-    // 4️⃣ Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     if (decoded.role !== "admin") {
@@ -28,9 +27,7 @@ export function verifyAdmin(req, res, next) {
       });
     }
 
-    // 5️⃣ Guardar admin
     req.admin = decoded;
-
     next();
   } catch (err) {
     console.error("verifyAdmin error:", err.message);

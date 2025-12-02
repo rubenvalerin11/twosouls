@@ -6,22 +6,23 @@ import { useRouter } from "next/navigation";
 
 export default function AdminLogin() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleLogin = async (e: any) => {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin(e: any) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
     try {
       const res = await axios.post(
         "http://localhost:3001/api/admin/auth/login",
-        {
-          email: e.target.email.value,
-          password: e.target.password.value,
-        },
-        { withCredentials: true }
+        { email, password },
+        { withCredentials: true } //  OBLIGATORIO para recibir cookie
       );
 
       if (res.data.success) {
@@ -29,43 +30,43 @@ export default function AdminLogin() {
       } else {
         setError("Credenciales incorrectas");
       }
-    } catch (err) {
-      console.error("Login error:", err);
+    } catch (err: any) {
+      console.log("LOGIN ERROR:", err.response?.data || err);
       setError("Error en el servidor");
     }
 
     setLoading(false);
-  };
+  }
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-black text-white">
       <form
         onSubmit={handleLogin}
-        className="w-[340px] p-6 bg-neutral-900 border border-neutral-800 rounded-xl shadow-lg"
+        className="bg-neutral-900 p-6 rounded-xl w-[350px] border border-neutral-800"
       >
-        <h1 className="text-2xl font-semibold mb-4">Admin Two Souls</h1>
+        <h1 className="text-xl font-bold mb-4">Admin Two Souls</h1>
 
         <input
           name="email"
           type="email"
           placeholder="Email"
-          className="w-full mb-3 p-3 rounded bg-neutral-800 outline-none"
           required
+          className="w-full p-3 mb-3 bg-neutral-800 rounded"
         />
 
         <input
           name="password"
           type="password"
-          placeholder="Password"
-          className="w-full mb-4 p-3 rounded bg-neutral-800 outline-none"
+          placeholder="Contraseña"
           required
+          className="w-full p-3 mb-4 bg-neutral-800 rounded"
         />
 
         {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
         <button
-          className="w-full py-3 bg-white text-black rounded-lg font-semibold"
           disabled={loading}
+          className="w-full bg-white text-black py-3 rounded font-semibold"
         >
           {loading ? "Ingresando..." : "Ingresar"}
         </button>
