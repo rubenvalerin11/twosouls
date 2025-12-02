@@ -1,27 +1,19 @@
-// backend/controllers/adminDashboardController.js
-
-
 export const getDashboardMetrics = (req, res) => {
-  res.status(200).json({
-    totalOrders: 8,
-    pendingOrders: 3,
-    totalIncome: 12400,
-    activeProducts: 5,
+  res.json({
+    totalOrders: 42,
+    pendingOrders: 5,
+    totalIncome: 1295000,
+    activeProducts: 18,
+    salesByDay: [
+      { label: "Lun", value: 5 },
+      { label: "Mar", value: 8 },
+      { label: "Mié", value: 3 },
+      { label: "Jue", value: 10 },
+      { label: "Vie", value: 7 },
+    ],
     lastOrders: [
-      {
-        _id: "1",
-        customer: "Juan Pérez",
-        total: 200,
-        status: "pending",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        _id: "2",
-        customer: "Lucía Gómez",
-        total: 150,
-        status: "shipped",
-        createdAt: new Date().toISOString(),
-      },
+      { id: "TS-001", client: "Juan Pérez", total: 25000, status: "completado" },
+      { id: "TS-002", client: "María López", total: 39500, status: "pendiente" },
     ],
   });
 };

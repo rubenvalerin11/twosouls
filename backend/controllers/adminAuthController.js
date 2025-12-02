@@ -1,38 +1,28 @@
-// backend/controllers/adminAuthController.js
-import dotenv from "dotenv";
-dotenv.config();
+import Admin from "../models/Admin.js";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const adminLogin = (req, res) => {
-  const { email, password } = req.body;
+export const loginAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-  const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-  const JWT_SECRET = process.env.JWT_SECRET;
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(404).json({ message: "Admin no encontrado" });
+    }
 
-  if (!email || !password) {
-    return res.status(400).json({ success: false, message: "Datos incompletos" });
-  }
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
+    }
 
-  if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-    return res.status(401).json({
-      success: false,
-      message: "Credenciales inválidas",
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
     });
+
+    res.status(200).json({ token, admin });
+  } catch (error) {
+    console.error("Login error", error);
+    res.status(500).json({ message: "Error del servidor" });
   }
-
-  const token = jwt.sign({ email, role: "admin" }, JWT_SECRET, {
-    expiresIn: "8h",
-  });
-
-  console.log("LOGIN: generando cookie admin_token →", token.substring(0, 20)); // 🔥 DEBUG
-
-  res.cookie("admin_token", token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-    path: "/",
-  });
-
-  return res.json({ success: true });
 };

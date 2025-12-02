@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import cloudinary from "../config/cloudinary.js";
-import verifyAdmin from "../middlewares/verifyAdmin.js";
+import { verifyAdmin } from "../middlewares/verifyAdmin.js"; // ✅
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 

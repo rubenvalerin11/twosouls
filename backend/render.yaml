@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: twosouls-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run dev
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: MONGO_URI
+        value: <mongodb+srv://twosouls_admin:Tavo2025SecureDB@cluster0.ubmi586.mongodb.net/twosouls_db?retryWrites=true&w=majority&appName=Cluster0>
+      - key: JWT_SECRET
+        value: <mLBJwi6Wcvvi8OAo>
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dukuc8xqm
+      - key: CLOUDINARY_API_KEY
+        value: <723831598721281>
+      - key: CLOUDINARY_API_SECRET
+        value: <bqggbnz0EEx29DQaWsDBg9M7uFE>
+    autoDeploy: true

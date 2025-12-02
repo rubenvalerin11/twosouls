@@ -1,31 +1,69 @@
-// backend/controllers/adminInvoiceController.js
+export const getInvoiceHTML = async (req, res) => {
+  try {
+    const orderId = req.params.id;
 
-exports.getInvoiceHTML = (req, res) => {
-  const { id } = req.params;
+    // ⚠️ MOCK DATA - Esto se conecta a tu modelo real de Order más adelante
+    const mockOrder = {
+      _id: orderId,
+      customer: "Juan Pérez",
+      items: [
+        { name: "Camiseta Negra", quantity: 2, price: 25 },
+        { name: "Jeans Azul", quantity: 1, price: 40 },
+      ],
+      total: 90,
+      status: "completed",
+      createdAt: new Date(),
+    };
 
-  const html = `
-    <html>
-      <head>
-        <title>Factura #${id}</title>
-        <style>
-          body { font-family: Arial; padding: 20px; }
-          h1 { color: #444; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          td, th { border: 1px solid #ccc; padding: 10px; }
-        </style>
-      </head>
-      <body>
-        <h1>Factura #${id}</h1>
-        <p>Cliente: Juan Pérez</p>
-        <p>Fecha: ${new Date().toLocaleDateString()}</p>
-        <table>
-          <tr><th>Producto</th><th>Cantidad</th><th>Precio</th></tr>
-          <tr><td>Camisa Oversize</td><td>2</td><td>$39.99</td></tr>
-          <tr><td>Total</td><td></td><td>$79.98</td></tr>
-        </table>
-      </body>
-    </html>
-  `;
+    const invoiceHTML = `
+      <html>
+        <head>
+          <title>Factura ${mockOrder._id}</title>
+          <style>
+            body { font-family: sans-serif; padding: 40px; }
+            h1 { color: #333; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+            th { background-color: #f8f8f8; }
+          </style>
+        </head>
+        <body>
+          <h1>Factura de Pedido</h1>
+          <p><strong>Cliente:</strong> ${mockOrder.customer}</p>
+          <p><strong>ID del pedido:</strong> ${mockOrder._id}</p>
+          <p><strong>Estado:</strong> ${mockOrder.status}</p>
+          <p><strong>Fecha:</strong> ${new Date(mockOrder.createdAt).toLocaleString()}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${mockOrder.items
+                .map(
+                  (item) => `
+                <tr>
+                  <td>${item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td>$${item.price.toFixed(2)}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+          <h3>Total: $${mockOrder.total.toFixed(2)}</h3>
+        </body>
+      </html>
+    `;
 
-  res.send(html);
+    res.set("Content-Type", "text/html");
+    res.send(invoiceHTML);
+  } catch (error) {
+    console.error("Error generando factura:", error);
+    res.status(500).json({ error: "No se pudo generar la factura" });
+  }
 };
