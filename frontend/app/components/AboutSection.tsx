@@ -10,7 +10,7 @@ export default function AboutSection() {
         </p>
 
         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Una marca nacida de la dualidad.
+          Un diseno del alma
         </h2>
 
         <p className="text-sm leading-relaxed text-neutral-400">

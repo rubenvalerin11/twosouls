@@ -1,12 +1,22 @@
+// app/layout.tsx
+import "./globals.css";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import { CartProvider } from "./context/CartContext";
 export const metadata = {
-  title: "Two Souls",
+  title: "TwoSouls",
+  description: "Luxury Streetwear - TwoSouls CR",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body style={{ fontFamily: "sans-serif", backgroundColor: "#fff", color: "#000" }}>
-        {children}
+      <body className="bg-black text-white">
+        <CartProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

@@ -2,15 +2,15 @@ import ProductCard from "./ProductCard";
 
 const products = [
   {
-    name: "Camisa TwoSouls",
+    name: "TwoSouls Diamonds Black Tee",
     price: 23000,
-    image: "/products/shirt1.png"
+    image: "https://res.cloudinary.com/dukuc8xqm/image/upload/v1763750371/camisafondonuevo_p0ev9n.png",
   },
   {
-    name: "Bandama Twosouls",
+    name: "TwoSouls StarShine Bandana",
     price: 5000,
-    image: "/products/pants1.png"
-  }
+    image: "https://res.cloudinary.com/dukuc8xqm/image/upload/v1763750373/panuelonew_b2gukh.png",
+  },
 ];
 
 export default function FeaturedGrid() {
@@ -19,8 +19,8 @@ export default function FeaturedGrid() {
       <h2 className="text-3xl font-semibold mb-6">Piezas destacadas</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {products.map((p, i) => (
-          <ProductCard key={i} product={p} />
+        {products.map((product, index) => (
+          <ProductCard key={index} product={product} />
         ))}
       </div>
     </section>
