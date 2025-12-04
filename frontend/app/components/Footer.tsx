@@ -6,29 +6,6 @@ export default function Footer() {
   return (
     <footer className="bg-black text-white px-6 pt-20 pb-14">
 
-      {/* ========================================================= */}
-      {/*  SECCIÓN NEWSLETTER (ESTILO BERSHKA) */}
-      {/* ========================================================= */}
-      <div className="text-center max-w-3xl mx-auto mb-20">
-        <h2 className="text-3xl font-semibold tracking-wide uppercase mb-3">
-          Suscríbete a nuestra Newsletter
-        </h2>
-
-        <p className="text-white/70 mb-10">
-          ¡Sé el primero en recibir nuevas colecciones, actualizaciones y noticias exclusivas!
-        </p>
-
-        <div className="flex justify-center gap-4">
-          <input
-            type="email"
-            placeholder="Correo electrónico"
-            className="bg-white/5 border border-white/20 px-4 py-3 text-sm w-72 outline-none"
-          />
-          <button className="bg-white text-black px-6 py-3 text-xs tracking-widest uppercase rounded-full">
-            Suscribirse
-          </button>
-        </div>
-      </div>
 
       {/* ========================================================= */}
       {/*  COLUMNAS FUSIONADAS */}
@@ -66,8 +43,7 @@ export default function Footer() {
           <h4 className="font-semibold text-white mb-3 text-lg">We are TwoSouls</h4>
 
           <ul className="space-y-2">
-            <li>Streetwear limitado</li>
-            <li>Sostenibilidad</li>
+        
             <li>Real Fame Eternal Bonds</li>
           
           </ul>
@@ -79,7 +55,6 @@ export default function Footer() {
 
           <ul className="space-y-2">
             <li>Camisetas</li>
-            <li>Bandanas</li>
             <li>Accesorios</li>
          
           </ul>
@@ -111,7 +86,7 @@ export default function Footer() {
         </p>
 
         <p className="text-white/40 text-xs mt-2">
-          Design by <b>Ruben Valerin</b>.
+          Design by <b>Ruben Valerin</b>
         </p>
       </div>
     </footer>

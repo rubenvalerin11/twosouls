@@ -1,18 +1,33 @@
-// frontend/lib/api.ts
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
-
 export async function getProducts() {
-  const res = await fetch(`${API_URL}/products`, { cache: "no-store" });
-  if (!res.ok) {
-    console.error("❌ Error al cargar productos desde API");
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Error al obtener los productos");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("API PRODUCTS ERROR:", error);
     return [];
   }
-  return res.json();
 }
 
 export async function getProductById(id: string) {
-  const res = await fetch(`${API_URL}/products/${id}`, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Error al obtener el producto");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("API PRODUCT ERROR:", error);
+    return null;
+  }
 }

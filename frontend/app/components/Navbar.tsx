@@ -4,93 +4,95 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { HiMenuAlt3 } from "react-icons/hi";
-import { FaInstagram } from "react-icons/fa";
+import { FaInstagram, FaTiktok } from "react-icons/fa";
 import NavbarCartIcon from "./NavbarCartIcon";
 import CartSidebar from "./CartSidebar";
 import { useCart } from "@/app/context/CartContext";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/#colecciones", label: "Colecciones" },
+  { href: "/products", label: "Productos" },
   { href: "/#about", label: "Nosotros" },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { totalItems, cartOpen, setCartOpen } = useCart();
-
-  const goInstagram = () => {
-    window.open(
-      "https://www.instagram.com/itwosouls?igsh=NTB5bWZhdXk0am51&utm_source=qr",
-      "_blank"
-    );
-  };
+  const { cartOpen, setCartOpen } = useCart();
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-black/10 bg-[#f4f3f1]/80 backdrop-blur">
+      <header className="sticky top-0 z-50 bg-white border-b border-black/10 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/ts-logo.png"
               alt="TwoSouls"
-              width={34}
-              height={34}
-              className="rounded-full border border-black/10"
+              width={38}
+              height={38}
+              className="rounded-full border border-black/20"
             />
-            <span className="text-[0.7rem] font-semibold uppercase tracking-[0.35em]">
+            <span className="text-[0.75rem] font-semibold uppercase tracking-[0.35em] text-black">
               TwoSouls
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-6 text-[0.65rem] font-medium uppercase tracking-[0.3em] md:flex">
+          {/* Links desktop */}
+          <nav className="hidden md:flex items-center gap-6 text-[0.7rem] font-medium uppercase tracking-[0.3em]">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-black/70 transition hover:text-black"
+                className="text-black/70 hover:text-black transition"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          {/* Icons */}
+          <div className="flex items-center gap-5">
+
+            {/* TikTok */}
             <button
-              type="button"
-              className="hidden items-center gap-2 text-[0.65rem] font-medium uppercase tracking-[0.25em] text-black/70 hover:text-black md:flex"
-              onClick={goInstagram}
+              onClick={() => window.open("https://www.tiktok.com/@twosoulscr", "_blank")}
+              className="hidden md:flex text-black/70 hover:text-black text-lg"
             >
-              <FaInstagram />
-              Instagram
+              <FaTiktok />
             </button>
 
-            {/* 🛒 CARRITO — AHORA FUNCIONAL */}
-            <div
-              className="relative cursor-pointer"
-              onClick={() => setCartOpen(true)}
+            {/* Instagram */}
+            <button
+              onClick={() => window.open("https://www.instagram.com/itwosouls", "_blank")}
+              className="hidden md:flex text-black/70 hover:text-black text-lg"
             >
+              <FaInstagram />
+            </button>
+
+            {/* Cart */}
+            <div className="cursor-pointer" onClick={() => setCartOpen(true)}>
               <NavbarCartIcon />
             </div>
 
+            {/* Mobile menu */}
             <button
-              type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/20 md:hidden"
-              onClick={() => setOpen((v) => !v)}
+              className="md:hidden flex h-9 w-9 items-center justify-center rounded-full border border-black/20"
+              onClick={() => setOpen(!open)}
             >
-              <HiMenuAlt3 className="text-lg" />
+              <HiMenuAlt3 className="text-xl text-black" />
             </button>
           </div>
         </div>
 
+        {/* Mobile nav */}
         {open && (
-          <nav className="border-t border-black/10 bg-[#f4f3f1] px-4 py-3 md:hidden">
-            <div className="flex flex-col gap-3 text-[0.7rem] font-medium uppercase tracking-[0.3em]">
+          <nav className="md:hidden px-4 py-4 bg-white border-t border-black/10">
+            <div className="flex flex-col gap-4 text-[0.75rem] font-medium uppercase tracking-[0.3em]">
               {links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="py-1"
                   onClick={() => setOpen(false)}
                 >
                   {link.label}
@@ -101,7 +103,7 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* 🛒 SIDEBAR DEL CARRITO */}
+      {/* Cart sidebar */}
       <CartSidebar open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
