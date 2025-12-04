@@ -1,7 +1,6 @@
 // frontend/app/page.tsx
 import Hero from "./components/Hero";
 import NewsBar from "./components/NewsBar";
-import CollectionStrip from "./components/CollectionStrip";
 import FeaturedGrid from "./components/FeaturedGrid";
 import AboutSection from "./components/AboutSection";
 
