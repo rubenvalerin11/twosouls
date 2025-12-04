@@ -1,14 +1,18 @@
-export async function fetchProducts() {
-  try {
-    const res = await fetch("http://localhost:3001/api/products", {
-      cache: "no-store",
-    });
+// frontend/lib/api.ts
 
-    if (!res.ok) return [];
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
 
-    return await res.json();
-  } catch (err) {
-    console.error("PRODUCTS ERROR:", err);
+export async function getProducts() {
+  const res = await fetch(`${API_URL}/products`, { cache: "no-store" });
+  if (!res.ok) {
+    console.error("❌ Error al cargar productos desde API");
     return [];
   }
+  return res.json();
+}
+
+export async function getProductById(id: string) {
+  const res = await fetch(`${API_URL}/products/${id}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return res.json();
 }
